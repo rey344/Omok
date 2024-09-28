@@ -3,7 +3,8 @@
 abstract class MoveStrategy {
     protected $board;
 
-    function __construct(array $board = null) {
+    // Constructor to set the board object
+    function __construct(Board $board) {
         $this->board = $board;
     }
 

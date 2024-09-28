@@ -1,18 +1,21 @@
+<?php
+
 abstract class MoveStrategy {
-	 protected $board;
+    protected $board;
 
-	 function __contruct(Board $board = null) {
-	 	  $this->board = $board;
-	 }
+    function __construct(array $board = null) {
+        $this->board = $board;
+    }
 
-	 abstract function pickPlace();
+    abstract function pickPlace();
 
-	 function toJson() {
-	 	  return array('name' => get_class($this));
-	}
+    function toJson() {
+        return array('name' => get_class($this));
+    }
 
-	static function fromJson() {
-	       $strategy = new static();
-	       return $stategy;
-	}
+    static function fromJson() {
+        $strategy = new static();
+        return $strategy;
+    }
 }
+?>

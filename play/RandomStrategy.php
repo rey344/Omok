@@ -5,10 +5,12 @@ class RandomStrategy extends MoveStrategy {
 public function pickPlace() {
 	$availableMoves = [];  
 
+    $boardState = $this->board->getBoard();
+    
 	// Loop through the board to find available places
-	for ($i = 0; $i < count($this->board); $i++) {
-		for ($j = 0; $j < count($this->board[$i]); $j++) {
-			if ($this->board[$i][$j] === 0) {
+	for ($i = 0; $i < count($boardState); $i++) {
+		for ($j = 0; $j < count($boardState[$i]); $j++) {
+			if ($boardState[$i][$j] === 0) {
 				$availableMoves[] = [$i, $j]; // add coordinates to availableMoves
 			}
 		}
@@ -23,5 +25,12 @@ public function pickPlace() {
 	}
 }
 }
+
+$board = new Board();
+$strategy = new RandomStrategy($board);
+$move = $strategy-> pickPlace();
+if ($move != null) {
+    $board->placeStone($move[0], $move[1]);
+}
+$board->displayBoard();
 ?>
-<?php
