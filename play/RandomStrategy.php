@@ -8,9 +8,9 @@ public function pickPlace() {
     $boardState = $this->board->getBoard();
     
 	// Loop through the board to find available places
-	for ($i = 0; $i < count($boardState); $i++) {
-		for ($j = 0; $j < count($boardState[$i]); $j++) {
-			if ($boardState[$i][$j] === 0) {
+	for ($i = 0; $i < $this->board->getSize(); $i++) {
+		for ($j = 0; $j < $this->board->getSize(); $j++) {
+			if ($this->board->isMoveValid($i, $j)) {
 				$availableMoves[] = [$i, $j]; // add coordinates to availableMoves
 			}
 		}
@@ -26,11 +26,5 @@ public function pickPlace() {
 }
 }
 
-$board = new Board();
-$strategy = new RandomStrategy($board);
-$move = $strategy-> pickPlace();
-if ($move != null) {
-    $board->placeStone($move[0], $move[1]);
-}
-$board->displayBoard();
+
 ?>

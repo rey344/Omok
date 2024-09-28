@@ -23,7 +23,7 @@ class Board {
     }
 
     public function placeStone($x, $y, $player = 1) {
-        if ($this->isWithinBounds($x, $y) && $this->grid[$x][$y] == 0) {    // Check if cell is empty
+        if ($this->isMoveValid($x, $y)) {    // Check if cell is empty
             $this->grid[$x][$y] = $player; // Mark the cell with the player's value (default 1)
             return true; // Successfully placed
         }
