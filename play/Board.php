@@ -8,6 +8,15 @@ class Board {
         $this->initializeBoard();  // Set up an empty 15x15 board with 0s
     }
 
+    // Method to set the board state
+    public function setBoard(array $board) {
+        if (count($board) === $this->size && count($board[0]) === $this->size) {
+            $this->grid = $board; // Update the grid with a new board state
+        } else {
+            echo "Error: Board size mismatch. Expected a {$this->size}x{$this->size} array.\n";
+        }
+    }
+    
     // Method to initialize or reset the board with empty values (0)
     public function initializeBoard() {
         $this->grid = array_fill(0, $this->size, array_fill(0, $this->size, 0));
@@ -40,6 +49,10 @@ class Board {
         }
     }
 
+    public function isMoveValid($x, $y) {
+        // Check if the coordinates are within bounds and if the cell is empty
+        return $this->isWithinBounds($x, $y) && $this->grid[$x][$y] === 0;
+    }
     // Method to get the board size
     public function getSize() {
         return $this->size;
