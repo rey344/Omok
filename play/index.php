@@ -2,7 +2,7 @@
 require_once 'Board.php';
 require_once 'MoveStrategy.php';
 require_once 'RandomStrategy.php';
-
+require_once 'SmartStrategy.php';
 // Define the board
 $board = new Board();
 $strategy = new RandomStrategy($board);
