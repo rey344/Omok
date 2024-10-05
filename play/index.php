@@ -1,22 +1,11 @@
 <?php
-require_once 'Board.php';
-require_once 'MoveStrategy.php';
-require_once 'RandomStrategy.php';
-require_once 'SmartStrategy.php';
-// Define the board
-$board = new Board();
-$strategy = new RandomStrategy($board);
-
-$move = $strategy->pickPlace();
-
-echo "Randomly selected move: ";
-print_r($move);
-
-if ($move != null) {
-    $board->placeStone($move[0], $move[1]);
+// To work with https, enable the php_openssl in the php.ini file, i.e.,
+// extension=php_openssl.dll
+$url = 'https://www.cs.utep.edu/cheon/cs3360/project/omok/play/';
+$pid = '6029ae684ab97';
+$xy = '7,8';
+$response = @file_get_contents("$url?pid=$pid&move=$xy");
+if ($response) {
+    echo $response;
 }
-echo "Board state after the move:\n";
-$board->displayBoard();
 ?>
-
-<?php
