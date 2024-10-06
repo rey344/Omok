@@ -1,0 +1,78 @@
+<?php
+    require_once 'Board.php'; 
+    require_once 'MoveStrategy.php';
+    require_once 'RandomStrategy.php';
+    require_once 'SmartStrategy.php';
+ 
+    // Retrieve game identifiers and move coordinates from the query string
+    $pid = $_GET['pid']; // pid stands for game identifier, unique to each game session
+    $x = (int)$_GET['x']; // 'x' is the horizontal coordinate of the move on the game board
+    $y = (int)$_GET['y']; // 'y' is the vertical coordinate of the move on the game board
+
+    // Check if the game file for the current session exists
+    if (!file_exists("games/$pid.json")) {
+        // If the game file does not exist, respond with an error
+        echo json_encode(['response' => false, 'reason' => 'Unknown game ID']);
+        exit;  // Stop further script execution since there's no valid game session
+    }
+
+    //attempt to read the game file
+    
+
+    // Load the game state from the JSON file
+    $game_state = json_decode(file_get_contents("games/$pid.json"), true);
+
+    // Initialize the game board with the current state
+    $board = new Board();
+    $board->setBoard($game_state['board']);  // Assume 'board' key holds the current board state
+
+    // Check if the move is valid before processing
+    if (!$board->isMoveValid($x, $y)) {
+        echo json_encode(['response' => false, 'reason' => 'Invalid move']);
+        exit;
+    }
+
+    // Process the player's move
+    $board->placeStone($x, $y, 1); // Assume player 1 is making the move
+
+    // Check if the move results in a win
+    $isWin = $board->checkWin($x, $y);  // Method to be implemented in Board class
+    $isDraw = $board->checkDraw();      // Method to check for a draw, to be implemented
+
+    // Implement AI move strategy - let's say we use RandomStrategy as an example
+    $strategy = new RandomStrategy($board);
+    $aiMove = $strategy->pickPlace();
+
+    if ($aiMove) {
+        $board->placeStone($aiMove['x'], $aiMove['y'], 2); // Place AI move
+    }
+
+    // Update game state with the new board configuration
+    $updatedGameState = $board->getBoard();
+
+    // Save the updated game state back to the file
+    file_put_contents("games/$pid.json", json_encode(['board' => $updatedGameState]));
+
+    // Set the content type of the response to application/json
+    header('Content-Type: application/json');
+
+    // Send the updated game state and move acknowledgment back to the client
+    echo json_encode([
+        'response' => true,
+        'ack_move' => [
+            'x' => $x,
+            'y' => $y,
+            'isWin' => $isWin,
+            'isDraw' => $isDraw,
+            'row' => $board->getWinningRow() // Assuming getWinningRow returns the indices of the winning row
+        ],
+        'move' => [
+            'x' => $aiMove ? $aiMove['x'] : null,
+            'y' => $aiMove ? $aiMove['y'] : null,
+            'isWin' => $board->checkWin($aiMove['x'], $aiMove['y']),
+            'isDraw' => $board->checkDraw(),
+            'row' => $aiMove ? $board->getWinningRow() : []
+        ]
+    ]);
+?>
+B
