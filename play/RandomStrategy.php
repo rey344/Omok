@@ -35,7 +35,7 @@ class RandomStrategy extends MoveStrategy {
         for ($i = 0; $i < $boardSize; $i++) {
             for ($j = 0; $j < $boardSize; $j++) {
                 if ($this->board->isMoveValid($i, $j)) {
-                    $availableMoves[] = [$i, $j];  // Add the valid move to the list
+                    $availableMoves[] =  ['x' => $i, 'y' => $j];  // Add the valid move to the list
                 }
             }
         }

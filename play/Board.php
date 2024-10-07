@@ -65,7 +65,7 @@ class Board {
      * @param int $y The y-coordinate to check.
      * @return bool True if the move is within bounds and the spot is available, false otherwise.
      */
-    private function isMoveValid($x, $y) {
+    public function isMoveValid($x, $y) {
         return $this->isWithinBounds($x, $y) && $this->grid[$x][$y] === 0;
     }
 
@@ -89,12 +89,14 @@ class Board {
         return $this->grid;
     }
 
+    
+
     /**
      * Outputs the board to the console for debugging or display purposes, showing its current state.
      */
     public function displayBoard() {
-        for ($i = 0; $i < this->size; $i++) {
-            for ($j = 0; $j < this->size; $j++) {
+        for ($i = 0; $i < $this->size; $i++) {
+            for ($j = 0; $j < $this->size; $j++) {
                 echo $this->grid[$i][$j] . " ";
             }
             echo "\n"; // New line for each row
@@ -146,7 +148,7 @@ class Board {
         $count = 0;
         $i = $x + $dx;
         $j = $y + $dy;
-        while (this->isWithinBounds($i, $j) && $this->grid[$i][$j] == $player) {
+        while ($this->isWithinBounds($i, $j) && $this->grid[$i][$j] == $player) {
             $count++;
             $i += $dx;
             $j += $dy;

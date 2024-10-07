@@ -4,16 +4,18 @@ require_once 'MoveStrategy.php';
 require_once 'RandomStrategy.php';
 require_once 'SmartStrategy.php';
 
+
+
 // Setup and validate game environment
 list($pid, $x, $y) = validateGameEnvironment();
 
 // Load game state and initialize board
-$board = loadGameState("games/$pid.json");
+$board = loadGameState("../games/$pid.json");
 
 // Process player move and determine outcome
 list($isWin, $isDraw, $aiMove) = processMove($board, $x, $y);
 
-// Update game state after AI move and save
+// Update game state after server move and save
 updateGameState($board, $pid, $aiMove);
 
 // Respond with the updated game state and outcomes
@@ -27,10 +29,30 @@ function validateGameEnvironment() {
     $x = (int)($_GET['x'] ?? -1);
     $y = (int)($_GET['y'] ?? -1);
 
-    if (!file_exists("games/$pid.json")) {
+    // Check if pid is missing or empty
+    if (empty($pid)) {
+        respondWithError('No game ID specified');
+    }
+
+    // Adjust the path to be relative to the current file's directory
+    $filePath = realpath("../games/$pid.json");
+
+    // Debug: Print the path being checked
+    echo "Checking game file at path: $filePath<br>";
+
+    if (!$filePath || !file_exists($filePath)) {
+        echo "File not found at: $filePath<br>";
         respondWithError('Unknown game ID');
     }
+    echo "File found at: $filePath<br>";
     return [$pid, $x, $y];
+
+
+
+ //   if (!file_exists("games/$pid.json")) {
+ //       respondWithError('Unknown game ID');
+ //   }
+ //   return [$pid, $x, $y];
 }
 
 /**
@@ -44,7 +66,7 @@ function loadGameState($filename) {
 }
 
 /**
- * Processes the player move, checks game status, and handles AI move.
+ * Processes the player move, checks game status, and handles server move.
  */
 function processMove($board, $x, $y) {
     if (!$board->isMoveValid($x, $y)) {
@@ -69,7 +91,7 @@ function processMove($board, $x, $y) {
  */
 function updateGameState($board, $pid, $aiMove) {
     $updatedGameState = $board->getBoard();
-    file_put_contents("games/$pid.json", json_encode(['board' => $updatedGameState]));
+    file_put_contents("../games/$pid.json", json_encode(['board' => $updatedGameState]));
 }
 
 /**
