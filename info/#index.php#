@@ -1,0 +1,8 @@
+<?php
+// Preparing an array with game information.
+$info = [
+    'size' => 15, // 15x15 board size
+    'strategies' => ['Smart', 'Random'] // available strategies for playing the game
+];
+
+// set the 

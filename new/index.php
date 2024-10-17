@@ -1,29 +1,88 @@
 <?php
-// check if a strategy is specified and is one of the allowed values
-// this prevents clients from starting a game without a valid strategy
-if(!isset($_GET['strategy']) ||!in_array($_GET('strategy'], ['Smart', 'Random'])) {
-    // respond with an error if no valid strategy is specified
-    // this ensures the client knows the cause of the error and can handle it accordingly
-    echo json_encode(['responce' => false, 'reason' => "Invalid or not strategy specified']);
-    exit; // Stop further script execution as there's an error
+
+// Handles creating a new game and initializing the board state.
+
+// Include the Board class
+require_once '../play/Board.php';
+
+// Define allowed strategies in a configuration or as constants.
+define('ALLOWED_STRATEGIES', ['Smart', 'Random']);
+
+// Main logic
+handleNewGameRequest();
+
+/**
+ * Handles the creation of a new game by validating the strategy and generating a game ID.
+ */
+function handleNewGameRequest() {
+    $strategy = $_GET['strategy'] ?? '';
+
+    if (!isValidStrategy($strategy)) {
+        respondWithError(); // If no or invalid strategy, respond with a standard error.
+    }
+
+    $pid = generateUniqueId();
+
+    // Create the initial game state file for this game
+    createInitialGameState($pid, $strategy); // Pass the strategy to use
+
+    sendResponse($pid);
 }
 
-// Generate a unique game identifier using PHP's uniqid function
-// uniqid() is based on the microtime, providing a simple mechanism for unique ID's
-$pid = uniqid();
+/**
+ * Validates if the provided strategy is allowed.
+ */
+function isValidStrategy($strategy) {
+    return in_array($strategy, ALLOWED_STRATEGIES);
+}
 
-// prepare the responce array with the status and the unique game ID
-$responce = [
-    'response' => true, // indicates the request was successful
-    'pid' => $pid  // provides the client with the ID identifier for future requests
-];
+/**
+ * Generates a unique identifier for the new game session.
+ */
+function generateUniqueId() {
+    return uniqid();
+}
 
-// set the content type of the responce to application/json
-// this header informs the client that the returned content should be treated as JSON,
-// making it easier for the client-side JavaScript to parse it
-header('Content-Type: application/json');
+/**
+ * Creates the initial game state file using the Board class and saves it as a JSON file.
+ */
+function createInitialGameState($pid, $strategy) {
+    // Define the path to the new game state file in the 'games' directory
+    $filePath = "../games/$pid.json";
 
-// encode the responce array to JSON string and output it
-// json_encode converts the PHP array into a JSON-formatteds string for client consumption
-echo json_encode($response);
+    // Create a new Board object and initialize it
+    $board = new Board();
+    $board->initializeBoard(); // This sets up a 15x15 empty board
+
+    // Create the initial game state using the Board object's state
+    $initialGameState = [
+        'board' => $board->getBoard(), // Get the empty board state from the Board object
+        'currentPlayer' => 1,          // Set the current player to 1 (Player's turn)
+        'strategy' => $strategy        // Use the strategy provided in the request
+    ];
+
+    // Save the initial game state to the JSON file
+    file_put_contents($filePath, json_encode($initialGameState));
+}
+
+/**
+ * Sends a successful response with the unique game ID.
+ */
+function sendResponse($pid) {
+    header('Content-Type: application/json');
+    echo json_encode([
+        'response' => true,
+        'pid' => $pid
+    ]);
+}
+
+/**
+ * Sends a standard error response for missing or invalid strategy.
+ */
+function respondWithError() {
+    header('Content-Type: application/json');
+    echo json_encode(['response' => false]); // Return false response as required
+    exit;
+}
+
 ?>
